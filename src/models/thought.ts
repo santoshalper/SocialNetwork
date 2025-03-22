@@ -14,6 +14,22 @@ interface IThought extends Document {
     reactions: Schema.Types.ObjectId[];
 }
 
+function getDate(date: Date): any {
+    const Y = date.getUTCFullYear();
+    const M = date.getUTCMonth();
+    const D = date.getUTCDate();
+    const H = date.getUTCHours() - 4;
+    let AMPM = ''
+    if (H>12) {
+        AMPM = 'PM'
+    } else{
+        AMPM = 'AM'
+    }
+    const h = H % 12;
+    const Mi = date.getUTCMinutes();
+    return `posted on ${M}/${D}/${Y} at ${h}:${Mi} ${AMPM}`
+}
+
 const reactionSchema = new Schema<IReaction>(
     {
         reactionId: {
@@ -30,13 +46,10 @@ const reactionSchema = new Schema<IReaction>(
             type: String,
             required: true
         },
-        //@ts-ignore
         createdAt: {
             type: Date,
             default: Date.now,
-            get: (date: Date)=> {
-                return date.toLocaleDateString();
-            },
+            get: getDate
         }
     }
 )
@@ -48,14 +61,11 @@ const thoughtSchema = new Schema<IThought>(
             required: true,
             minlength: 1,
             maxlength:280,
-        },
-        //@ts-ignore
+        },  
         createdAt: {
             type: Date,
             default: Date.now,
-            get: (date: Date)=> {
-                return date.toLocaleDateString();
-            },
+            get: getDate
         },
         username: {
             type: String,
@@ -65,7 +75,8 @@ const thoughtSchema = new Schema<IThought>(
     },
     {
         toJSON: {
-            virutals: true
+            virtuals: true,
+            getters: true
         }
     }
 )

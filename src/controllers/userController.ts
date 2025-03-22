@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { User } from '../models/index.js'
+import { User, Thought } from '../models/index.js'
 //GET ALL /user
 export const getAllUsers = async (_req: Request, res: Response) => {
     try{
@@ -55,7 +55,8 @@ export const deleteUser = async (req: Request, res: Response) => {
     try {
         const user = await User.findOneAndDelete({ _id: req.params.userId });
         if(user){
-            res.status(200).json(user)
+            await Thought.deleteMany({_id: {$in: user.thoughts}})
+            res.status(200).json({message: 'users and thoughts deleted'})
         }else{
             res.status(404).json({message: 'user not found'});
         }
